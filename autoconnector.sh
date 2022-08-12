@@ -5,6 +5,7 @@ PROGNAME=$(basename $0)
 is_mapping_file=false
 ignore_sound=false
 ignore_ssh=false
+quiet=false
 
 
 function main() {
@@ -114,14 +115,18 @@ function check() {
   abort_flag=false
 
   if ! $ignore_sound && [[ $(is_playing) -gt 0 ]]; then
-    echo -e "Error: Some devices now playing musics" >&2
-    echo -e "       Specify option --ignore-sound to ignore devices playing musics" >&2
+    if ! $quiet ; then
+      echo -e "Error: Some devices now playing musics" >&2
+      echo -e "       Specify option --ignore-sound to ignore devices playing musics" >&2
+    fi
     abort_flag=true
   fi
 
   if ! $ignore_ssh && [[ $(is_logged_in) = "true" ]]; then
-    echo -e "Error: Some users now logged in via SSH" >&2
-    echo -e "       Specify option --ignore-ssh to ignore SSH connection" >&2
+    if ! $quiet ; then
+      echo -e "Error: Some users now logged in via SSH" >&2
+      echo -e "       Specify option --ignore-ssh to ignore SSH connection" >&2
+    fi
     abort_flag=true
   fi
 
@@ -152,6 +157,8 @@ function usage() {
   echo -e "    when some devices that have already connected to Bluetooth adapters are playing sounds"
   echo -e "  --ignore-ssh"
   echo -e "    Ignore SSH connection"
+  echo -e "  --quiet"
+  echo -e "    Do not show messages that indicates any errors"
 }
 
 
@@ -168,6 +175,10 @@ do
     ;;
     '--ignore-ssh' )
       ignore_ssh=true
+      shift 1
+    ;;
+    '--quiet' )
+      quiet=true
       shift 1
     ;;
     '-f' | '--file' )
